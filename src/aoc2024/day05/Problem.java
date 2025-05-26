@@ -1,14 +1,12 @@
 package aoc2024.day05;
 
 import java.io.*;
-import java.lang.*; // Math, etc.
 import java.util.*;
 
 import static utility.UsefulFunctions.*;
 
 public class Problem {
 
-    public static HashMap<Integer, HashSet<Integer>> forwardPairs = new HashMap<>();
     public static HashMap<Integer, HashSet<Integer>> backwardPairs = new HashMap<>();
     public static ArrayList<ArrayList<Integer>> instructions = new ArrayList<>();
     public static ArrayList<ArrayList<Integer>> incorrectinstructions = new ArrayList<>();
@@ -26,15 +24,10 @@ public class Problem {
                 int first = Integer.parseInt(st.nextToken());
                 int second = Integer.parseInt(st.nextToken());
 
-                if (!forwardPairs.containsKey(first)) {
-                    forwardPairs.put(first, new HashSet<>());
-                }
-
                 if (!backwardPairs.containsKey(second)) {
                     backwardPairs.put(second, new HashSet<>());
                 }
 
-                forwardPairs.get(first).add(second);
                 backwardPairs.get(second).add(first);
             }
 
@@ -88,22 +81,22 @@ public class Problem {
         return count;
     }
 
-    public static Object partTwo() { // going to assume nice
+    public static Object partTwo() { // advent of code makes this nice
         int count = 0;
         for (ArrayList<Integer> instruction : incorrectinstructions) {
-            HashMap<Integer, Integer> sigh = new HashMap<>();
+            HashMap<Integer, Integer> dependencyCounts = new HashMap<>();
             for (int i : instruction) {
                 if (backwardPairs.containsKey(i)) {
                     for (int j : backwardPairs.get(i)) {
-                        if (!sigh.containsKey(j)) {
-                            sigh.put(j, 0);
+                        if (!dependencyCounts.containsKey(j)) {
+                            dependencyCounts.put(j, 0);
                         }
-                        sigh.replace(j, sigh.get(j) + 1);
+                        dependencyCounts.replace(j, dependencyCounts.get(j) + 1);
                     }
                 }
             }
             for (int i : instruction) {
-                if (sigh.containsKey(i) && sigh.get(i) == (instruction.size() - 1) / 2) {
+                if (dependencyCounts.containsKey(i) && dependencyCounts.get(i) == (instruction.size() - 1) / 2) {
                     count += i;
                 }
             }
