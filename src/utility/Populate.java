@@ -32,7 +32,7 @@ public class Populate { // Run this function once
             e.printStackTrace();
         }
 
-        for (int i = 1; i <= 7; i += 1) {
+        for (int i = 1; i <= 8; i += 1) {
             directory = "src\\\\aoc" + String.valueOf(year) + "\\\\day" + (i < 10 ? "0" : "") + String.valueOf(i);
 
             File dir = new File(directory);
