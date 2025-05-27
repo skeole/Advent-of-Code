@@ -1,0 +1,26 @@
+Stats for 2024 Advent of Code solutions
+Day 1:  Part 1 :   1.97 ms | Part 2 :   0.44 ms
+Day 2:  Part 1 :   0.82 ms | Part 2 :   0.92 ms
+Day 3:  Part 1 :   3.12 ms | Part 2 :   4.15 ms
+Day 4:  Part 1 :   4.46 ms | Part 2 :   3.37 ms
+Day 5:  Part 1 :  16.10 ms | Part 2 :  13.75 ms
+Day 6:  Part 1 :   3.63 ms | Part 2 : 405.95 ms
+Day 7:  Part 1 : N/A       | Part 2 : N/A
+Day 8:  Part 1 : N/A       | Part 2 : N/A
+Day 9:  Part 1 : N/A       | Part 2 : N/A
+Day 10: Part 1 : N/A       | Part 2 : N/A
+Day 11: Part 1 : N/A       | Part 2 : N/A
+Day 12: Part 1 : N/A       | Part 2 : N/A
+Day 13: Part 1 : N/A       | Part 2 : N/A
+Day 14: Part 1 : N/A       | Part 2 : N/A
+Day 15: Part 1 : N/A       | Part 2 : N/A
+Day 16: Part 1 : N/A       | Part 2 : N/A
+Day 17: Part 1 : N/A       | Part 2 : N/A
+Day 18: Part 1 : N/A       | Part 2 : N/A
+Day 19: Part 1 : N/A       | Part 2 : N/A
+Day 20: Part 1 : N/A       | Part 2 : N/A
+Day 21: Part 1 : N/A       | Part 2 : N/A
+Day 22: Part 1 : N/A       | Part 2 : N/A
+Day 23: Part 1 : N/A       | Part 2 : N/A
+Day 24: Part 1 : N/A       | Part 2 : N/A
+Day 25: Part 1 : N/A       | Part 2 : N/A

@@ -12,9 +12,12 @@ public class Problem {
     public static String activate = "do()";
     public static String deactivate = "don't()";
 
+    public static final boolean actual = true;
+    public static final String fileURL = actual ? "src\\aoc2024\\day03\\problem.txt" : "src\\aoc2024\\day03\\example.txt";
+
     public static void parse() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("src\\aoc2024\\day03\\problem.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader(fileURL)); // rip
             while (true) {
                 String str = reader.readLine();
 
@@ -149,13 +152,55 @@ public class Problem {
         Object answer = partOne();
         endTime = System.nanoTime() / 1000000.0;
         println(answer);
-        println("Time taken to compute: " + round(endTime - startTime, 2) + " ms");
+        double firstTime = endTime - startTime;
+        println("Time taken to compute: " + round(firstTime, 2) + " ms");
         println("-----------------------");
         System.out.print("Part two answer: ");
         startTime = System.nanoTime() / 1000000.0;
         answer = partTwo();
         endTime = System.nanoTime() / 1000000.0;
         println(answer);
-        println("Time taken to compute: " + round(endTime - startTime, 2) + " ms");
+        double secondTime = endTime - startTime;
+        println("Time taken to compute: " + round(secondTime, 2) + " ms");
+
+        if (actual) {
+            try {
+                BufferedReader br = new BufferedReader(new FileReader("src\\\\aoc2024\\\\stats.txt"));
+                StringBuilder output = new StringBuilder();
+                for (int i = 0; i < 3; i += 1) {
+                    output.append(br.readLine()).append("\n");
+                }
+                br.readLine();
+                output.append("Day 3:  Part 1 : ");
+                output.append(
+                    firstTime >= 99999.5 ? "" + round(firstTime / 1000.0, 3) + " s" : 
+                    firstTime >= 9999.5 ? " " + round(firstTime / 1000.0, 3) + " s" : 
+                    firstTime >= 999.5 ? "  " + round(firstTime / 1000.0, 3) + " s" : 
+                    firstTime >= 99.5 ? "" + round(firstTime, 2) + " ms" : 
+                    firstTime >= 9.5 ? " " + round(firstTime, 2) + " ms" : 
+                    "  " + round(firstTime, 2) + " ms"
+                );
+                output.append(" | Part 2 : ");
+                output.append(
+                    secondTime >= 99999.5 ? "" + round(secondTime / 1000.0, 3) + " s" : 
+                    secondTime >= 9999.5 ? " " + round(secondTime / 1000.0, 3) + " s" : 
+                    secondTime >= 999.5 ? "  " + round(secondTime / 1000.0, 3) + " s" : 
+                    secondTime >= 99.5 ? "" + round(secondTime, 2) + " ms" : 
+                    secondTime >= 9.5 ? " " + round(secondTime, 2) + " ms" : 
+                    "  " + round(secondTime, 2) + " ms"
+                );
+                output.append("\n");
+                for (int i = 4; i <= 25; i += 1) {
+                    output.append(br.readLine()).append("\n");
+                }
+                br.close();
+                BufferedWriter bw = new BufferedWriter(new FileWriter("src\\\\aoc2024\\\\stats.txt"));
+                bw.write(output.toString());
+                bw.flush();
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -1,53 +1,27 @@
-package aoc2024.day05;
+package aoc2024.day07;
 
 import java.io.*;
+import java.lang.*; // Math, etc.
 import java.util.*;
 
 import static utility.UsefulFunctions.*;
 
 public class Problem {
 
-    public static HashMap<Integer, HashSet<Integer>> backwardPairs = new HashMap<>();
-    public static ArrayList<ArrayList<Integer>> instructions = new ArrayList<>();
-    public static ArrayList<ArrayList<Integer>> incorrectinstructions = new ArrayList<>();
-
     public static final boolean actual = true;
-    public static final String fileURL = actual ? "src\\aoc2024\\day05\\problem.txt" : "src\\aoc2024\\day05\\example.txt";
+    public static final String fileURL = actual ? "src\\aoc2024\\day07\\problem.txt" : "src\\aoc2024\\day07\\example.txt";
 
     public static void parse() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(fileURL)); // rip
-            while (true) {
-                String str = reader.readLine();
-                if (str.length() == 0) {
-                    break;
-                }
-                StringTokenizer st = new StringTokenizer(str, "|");
-
-                int first = Integer.parseInt(st.nextToken());
-                int second = Integer.parseInt(st.nextToken());
-
-                if (!backwardPairs.containsKey(second)) {
-                    backwardPairs.put(second, new HashSet<>());
-                }
-
-                backwardPairs.get(second).add(first);
-            }
-
+            BufferedReader reader = new BufferedReader(new FileReader(fileURL));
             while (true) {
                 String str = reader.readLine();
                 if (str == null) {
                     break;
                 }
+                StringTokenizer st = new StringTokenizer(str);
 
-                instructions.add(new ArrayList<>());
-                StringTokenizer st = new StringTokenizer(str, ",");
-
-                while (st.hasMoreTokens()) {
-                    instructions.get(instructions.size() - 1).add(Integer.parseInt(st.nextToken()));
-                }
             }
-
             reader.close();
         } catch (IOException e) {
             throw new IllegalArgumentException();
@@ -55,55 +29,12 @@ public class Problem {
     }
 
     public static Object partOne() {
-        int count = 0;
-
-        for (ArrayList<Integer> instruction : instructions) {
-            HashSet<Integer> found = new HashSet<>();
-            HashSet<Integer> betterNotFind = new HashSet<>();
-            boolean works = true;
-            for (int i : instruction) {
-                if (betterNotFind.contains(i)) {
-                    works = false;
-                }
-                found.add(i);
-                if (backwardPairs.containsKey(i)) {
-                    for (int j : backwardPairs.get(i)) {
-                        if (!found.contains(j)) {
-                            betterNotFind.add(j);
-                        }
-                    }
-                }
-            }
-            if (works) {
-                count += instruction.get((instruction.size() - 1) / 2);
-            } else {
-                incorrectinstructions.add(instruction);
-            }
-        }
-
+        int count = 0; // Obviously not all puzzles work this way, but most do... 
         return count;
     }
 
-    public static Object partTwo() { // advent of code makes this nice
+    public static Object partTwo() {
         int count = 0;
-        for (ArrayList<Integer> instruction : incorrectinstructions) {
-            HashMap<Integer, Integer> dependencyCounts = new HashMap<>();
-            for (int i : instruction) {
-                if (backwardPairs.containsKey(i)) {
-                    for (int j : backwardPairs.get(i)) {
-                        if (!dependencyCounts.containsKey(j)) {
-                            dependencyCounts.put(j, 0);
-                        }
-                        dependencyCounts.replace(j, dependencyCounts.get(j) + 1);
-                    }
-                }
-            }
-            for (int i : instruction) {
-                if (dependencyCounts.containsKey(i) && dependencyCounts.get(i) == (instruction.size() - 1) / 2) {
-                    count += i;
-                }
-            }
-        }
         return count;
     }
 
@@ -133,11 +64,11 @@ public class Problem {
             try {
                 BufferedReader br = new BufferedReader(new FileReader("src\\\\aoc2024\\\\stats.txt"));
                 StringBuilder output = new StringBuilder();
-                for (int i = 0; i < 5; i += 1) {
+                for (int i = 0; i < 7; i += 1) {
                     output.append(br.readLine()).append("\n");
                 }
                 br.readLine();
-                output.append("Day 5:  Part 1 : ");
+                output.append("Day 7:  Part 1 : ");
                 output.append(
                     firstTime >= 99999.5 ? "" + round(firstTime / 1000.0, 3) + " s" : 
                     firstTime >= 9999.5 ? " " + round(firstTime / 1000.0, 3) + " s" : 
@@ -156,7 +87,7 @@ public class Problem {
                     "  " + round(secondTime, 2) + " ms"
                 );
                 output.append("\n");
-                for (int i = 6; i <= 25; i += 1) {
+                for (int i = 8; i <= 25; i += 1) {
                     output.append(br.readLine()).append("\n");
                 }
                 br.close();

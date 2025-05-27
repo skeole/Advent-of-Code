@@ -126,20 +126,42 @@ public class UsefulFunctions {
     }
 
     public static class Tuple<F, S> {
-        private F First;
-        private S Second;
+        private F first;
+        private S second;
 
-        public Tuple(F First, S Second) {
-            this.First = First;
-            this.Second = Second;
+        public Tuple(F first, S second) {
+            this.first = first;
+            this.second = second;
         }
 
         public F getFirst() {
-            return First;
+            return first;
         }
 
         public S getSecond() {
-            return Second;
+            return second;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + first.toString() + ", " + second.toString() + ")";
+        }
+
+        public Tuple<F, S> copy() {
+            return new Tuple<F, S>(first, second);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Tuple<F, S> oo = (Tuple<F, S>) o;
+            return Objects.equals(getFirst(), oo.getFirst()) && Objects.equals(getSecond(), oo.getSecond());
         }
     }
 
