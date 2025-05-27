@@ -52,11 +52,10 @@ public class Populate { // Run this function once
                     bw.write(
 "package aoc" + String.valueOf(year) + ".day" + (i < 10 ? "0" : "") + String.valueOf(i) + ";\n\n" + 
 "import java.io.*;\n" + 
-"import java.lang.*; // Math, etc.\n" + 
 "import java.util.*;\n\n" + 
 "import static utility.UsefulFunctions.*;\n\n" + 
 "public class Problem {\n\n" + 
-"    public static final boolean actual = true;\n" + 
+"    public static final boolean actual = false;\n" + 
 "    public static final String fileURL = actual ? \"src\\\\aoc" + String.valueOf(year)  + "\\\\day" + (i < 10 ? "0" : "") + String.valueOf(i) + "\\\\problem.txt\" : \"src\\\\aoc" + String.valueOf(year)  + "\\\\day" + (i < 10 ? "0" : "") + String.valueOf(i) + "\\\\example.txt\";\n\n" + 
 "    public static void parse() {\n" + 
 "        try {\n" + 
