@@ -125,6 +125,33 @@ public class UsefulFunctions {
 
     }
 
+    public static int to_ascii(char c) {
+        return (int) c;
+    }
+
+    public static boolean in_bounds(int r, int c, int[][] array) {
+        return r > 0 && c > 0 && r < array.length && c < array[r].length;
+    }
+
+    public static ArrayList<Integer> countSubstringOccurences(CharSequence substring, CharSequence string) { // useful jumping-off code as well
+        ArrayList<Integer> occurences = new ArrayList<>();
+        for (int i = 0; i < string.length(); i += 1) {
+            if (string.charAt(i) == substring.charAt(0) && i + substring.length() <= string.length()) {
+                boolean works = true;
+                for (int j = 0; j < substring.length(); j += 1) {
+                    if (string.charAt(i + j) != substring.charAt(j)) {
+                        works = false;
+                        break;
+                    }
+                }
+                if (works) {
+                    occurences.add(i);
+                }
+            }
+        }
+        return occurences;
+    }
+
     public static class Tuple<F, S> {
         private F first;
         private S second;
@@ -165,31 +192,19 @@ public class UsefulFunctions {
         }
     }
 
-    public static int to_ascii(char c) {
-        return (int) c;
-    }
+    public static class ComplexNumber { // rectangular by default
+        public final int real;
+        public final int imaginary;
 
-    public static boolean in_bounds(int r, int c, int[][] array) {
-        return r > 0 && c > 0 && r < array.length && c < array[r].length;
-    }
-
-    public static ArrayList<Integer> countSubstringOccurences(CharSequence substring, CharSequence string) { // useful jumping-off code as well
-        ArrayList<Integer> occurences = new ArrayList<>();
-        for (int i = 0; i < string.length(); i += 1) {
-            if (string.charAt(i) == substring.charAt(0) && i + substring.length() <= string.length()) {
-                boolean works = true;
-                for (int j = 0; j < substring.length(); j += 1) {
-                    if (string.charAt(i + j) != substring.charAt(j)) {
-                        works = false;
-                        break;
-                    }
-                }
-                if (works) {
-                    occurences.add(i);
-                }
-            }
+        public ComplexNumber(int real, int imaginary) {
+            this.real = real;
+            this.imaginary = imaginary;
         }
-        return occurences;
+
+        @Override
+        public String toString() {
+            return String.valueOf(real) + (imaginary < 0 ? " - " : " + ") + String.valueOf(Math.abs(imaginary)) + "i";
+        }
     }
 
 }

@@ -7,7 +7,12 @@ import static utility.UsefulFunctions.*;
 
 public class Problem {
 
-    public static final boolean actual = false;
+    public static ArrayList<Tuple<Integer, Integer>> ninePositions = new ArrayList<>();
+    public static ArrayList<ArrayList<Integer>> grid = new ArrayList<>();
+    public static ArrayList<ArrayList<HashSet<Integer>>> canReach = new ArrayList<>();
+    public static ArrayList<ArrayList<Integer>> scores = new ArrayList<>();
+
+    public static final boolean actual = true;
     public static final String fileURL = actual ? "src\\aoc2024\\day10\\problem.txt" : "src\\aoc2024\\day10\\example.txt";
 
     public static void parse() {
@@ -18,22 +23,145 @@ public class Problem {
                 if (str == null) {
                     break;
                 }
-                StringTokenizer st = new StringTokenizer(str);
 
+                grid.add(new ArrayList<>());
+                canReach.add(new ArrayList<>());
+                scores.add(new ArrayList<>());
+                for (int i = 0; i < str.length(); i += 1) {
+                    grid.get(grid.size() - 1).add(str.charAt(i) - '0');
+                    scores.get(scores.size() - 1).add(0);
+                    canReach.get(scores.size() - 1).add(new HashSet<>());
+                    if (str.charAt(i) == '9') {
+                        scores.get(scores.size() - 1).set(i, 1);
+                        ninePositions.add(new Tuple<>(grid.size() - 1, i));
+                    }
+                }
             }
             reader.close();
+
+            for (int i = 0; i < ninePositions.size(); i += 1) {
+                canReach.get(ninePositions.get(i).getFirst()).get(ninePositions.get(i).getSecond()).add(i);
+            }
         } catch (IOException e) {
             throw new IllegalArgumentException();
         }
     }
 
+    
+
     public static Object partOne() {
-        int count = 0; // Obviously not all puzzles work this way, but most do... 
+        LinkedList<Tuple<Integer, Integer>> queue = new LinkedList<>();
+        for (Tuple<Integer, Integer> pos : ninePositions) {
+            queue.addLast(pos);
+        }
+
+        int count = 0;
+
+        while (!queue.isEmpty()) { // BFS --> some optimizations can be made :)
+            Tuple<Integer, Integer> pos = queue.removeFirst();
+            int value = grid.get(pos.getFirst()).get(pos.getSecond());
+            if (value == 0) {
+                count += canReach.get(pos.getFirst()).get(pos.getSecond()).size();
+            }
+            if (pos.getFirst() > 0) {
+                if (grid.get(pos.getFirst() - 1).get(pos.getSecond()).equals(value - 1)) {
+                    if (canReach.get(pos.getFirst() - 1).get(pos.getSecond()).size() == 0) {
+                        queue.add(new Tuple<Integer,Integer>(pos.getFirst() - 1, pos.getSecond()));
+                    }
+                    for (int i : canReach.get(pos.getFirst()).get(pos.getSecond())) {
+                        canReach.get(pos.getFirst() - 1).get(pos.getSecond()).add(i);
+                    }
+                }
+            }
+            if (pos.getFirst() < grid.size() - 1) {
+                if (grid.get(pos.getFirst() + 1).get(pos.getSecond()).equals(value - 1)) {
+                    if (canReach.get(pos.getFirst() + 1).get(pos.getSecond()).size() == 0) {
+                        queue.add(new Tuple<Integer,Integer>(pos.getFirst() + 1, pos.getSecond()));
+                    }
+                    for (int i : canReach.get(pos.getFirst()).get(pos.getSecond())) {
+                        canReach.get(pos.getFirst() + 1).get(pos.getSecond()).add(i);
+                    }
+                }
+            }
+            if (pos.getSecond() > 0) {
+                if (grid.get(pos.getFirst()).get(pos.getSecond() - 1).equals(value - 1)) {
+                    if (canReach.get(pos.getFirst()).get(pos.getSecond() - 1).size() == 0) {
+                        queue.add(new Tuple<Integer,Integer>(pos.getFirst(), pos.getSecond() - 1));
+                    }
+                    for (int i : canReach.get(pos.getFirst()).get(pos.getSecond())) {
+                        canReach.get(pos.getFirst()).get(pos.getSecond() - 1).add(i);
+                    }
+                }
+            }
+            if (pos.getSecond() < grid.get(0).size() - 1) {
+                if (grid.get(pos.getFirst()).get(pos.getSecond() + 1).equals(value - 1)) {
+                    if (canReach.get(pos.getFirst()).get(pos.getSecond() + 1).size() == 0) {
+                        queue.add(new Tuple<Integer,Integer>(pos.getFirst(), pos.getSecond() + 1));
+                    }
+                    for (int i : canReach.get(pos.getFirst()).get(pos.getSecond())) {
+                        canReach.get(pos.getFirst()).get(pos.getSecond() + 1).add(i);
+                    }
+                }
+            }
+        }
         return count;
     }
 
-    public static Object partTwo() {
+    public static Object partTwo() { // lmao this is what I originally did
+        LinkedList<Tuple<Integer, Integer>> queue = new LinkedList<>();
+        for (Tuple<Integer, Integer> pos : ninePositions) {
+            queue.addLast(pos);
+        }
+
         int count = 0;
+
+        while (!queue.isEmpty()) { // BFS --> some optimizations can be made :)
+            Tuple<Integer, Integer> pos = queue.removeFirst();
+            int value = grid.get(pos.getFirst()).get(pos.getSecond());
+            if (value == 0) {
+                count += scores.get(pos.getFirst()).get(pos.getSecond());
+            }
+            if (pos.getFirst() > 0) {
+                if (grid.get(pos.getFirst() - 1).get(pos.getSecond()).equals(value - 1)) {
+                    if (scores.get(pos.getFirst() - 1).get(pos.getSecond()) == 0) {
+                        queue.add(new Tuple<Integer,Integer>(pos.getFirst() - 1, pos.getSecond()));
+                    }
+                    scores.get(pos.getFirst() - 1).set(pos.getSecond(), 
+                        scores.get(pos.getFirst() - 1).get(pos.getSecond()) + scores.get(pos.getFirst()).get(pos.getSecond())
+                    );
+                }
+            }
+            if (pos.getFirst() < grid.size() - 1) {
+                if (grid.get(pos.getFirst() + 1).get(pos.getSecond()).equals(value - 1)) {
+                    if (scores.get(pos.getFirst() + 1).get(pos.getSecond()) == 0) {
+                        queue.add(new Tuple<Integer,Integer>(pos.getFirst() + 1, pos.getSecond()));
+                    }
+                    scores.get(pos.getFirst() + 1).set(pos.getSecond(), 
+                        scores.get(pos.getFirst() + 1).get(pos.getSecond()) + scores.get(pos.getFirst()).get(pos.getSecond())
+                    );
+                }
+            }
+            if (pos.getSecond() > 0) {
+                if (grid.get(pos.getFirst()).get(pos.getSecond() - 1).equals(value - 1)) {
+                    if (scores.get(pos.getFirst()).get(pos.getSecond() - 1) == 0) {
+                        queue.add(new Tuple<Integer,Integer>(pos.getFirst(), pos.getSecond() - 1));
+                    }
+                    scores.get(pos.getFirst()).set(pos.getSecond() - 1, 
+                        scores.get(pos.getFirst()).get(pos.getSecond() - 1) + scores.get(pos.getFirst()).get(pos.getSecond())
+                    );
+                }
+            }
+            if (pos.getSecond() < grid.get(0).size() - 1) {
+                if (grid.get(pos.getFirst()).get(pos.getSecond() + 1).equals(value - 1)) {
+                    if (scores.get(pos.getFirst()).get(pos.getSecond() + 1) == 0) {
+                        queue.add(new Tuple<Integer,Integer>(pos.getFirst(), pos.getSecond() + 1));
+                    }
+                    scores.get(pos.getFirst()).set(pos.getSecond() + 1, 
+                        scores.get(pos.getFirst()).get(pos.getSecond() + 1) + scores.get(pos.getFirst()).get(pos.getSecond())
+                    );
+                }
+            }
+        }
         return count;
     }
 
