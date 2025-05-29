@@ -207,4 +207,345 @@ public class UsefulFunctions {
         }
     }
 
+    public static class BetterArrayDeque<E> extends AbstractCollection<E> implements Deque<E>, List<E>, Cloneable { // #CancelJoshBlochAndNealGafter
+
+        @SuppressWarnings("unchecked")
+        E[] array = (E[]) new Object[2];
+
+        int firstIndex = 0;
+        int lastIndex = 0;
+
+        public BetterArrayDeque() {
+
+        }
+
+        public BetterArrayDeque(Collection<? extends E> c) { // huh
+            c.forEach(this::addLast);
+        }
+
+        int modifiedIndex(int i) {
+            return (i % array.length + array.length) % array.length;
+        }
+
+        public E get(int i) { // THE HOLY GRAIL
+            if (i < 0 || i >= size()) {
+                throw new IndexOutOfBoundsException();
+            }
+            return array[modifiedIndex(i + firstIndex)];
+        }
+
+        @Override
+        public E set(int i, E e) {
+            if (i < 0 || i >= size()) {
+                throw new IndexOutOfBoundsException();
+            }
+            E ret = array[modifiedIndex(i + firstIndex)];
+            array[modifiedIndex(i + firstIndex)] = e;
+            return ret;
+        }
+
+        private void expand() {
+            @SuppressWarnings("unchecked")
+            E[] arr = (E[]) new Object[2 * array.length]; // sigh
+
+            for (int i = firstIndex; i < lastIndex; i += 1) {
+                arr[i - firstIndex] = array[modifiedIndex(i)];
+            }
+
+            firstIndex = 0;
+            lastIndex = array.length;
+
+            array = arr;
+        }
+
+        private void contract() {
+            if (array.length <= 2) {
+                return;
+            }
+
+            @SuppressWarnings("unchecked")
+            E[] arr = (E[]) new Object[array.length / 2]; // sigh
+
+            for (int i = firstIndex; i < lastIndex; i += 1) {
+                arr[i - firstIndex] = array[modifiedIndex(i)];
+            }
+
+            firstIndex = 0;
+            lastIndex = array.length / 4;
+
+            array = arr;
+        }
+
+        @Override
+        public int size() {
+            return lastIndex - firstIndex;
+        }
+
+        public E[] asArray() {
+            @SuppressWarnings("unchecked")
+            E[] arr = (E[]) new Object[size()]; // much more interesting imo
+
+            for (int i = firstIndex; i < lastIndex; i += 1) {
+                arr[i - firstIndex] = array[modifiedIndex(i)];
+            }
+
+            return arr;
+        }
+
+        @Override
+        public void addFirst(E e) {
+            if (size() == array.length) {
+                expand();
+            }
+            firstIndex -= 1;
+            array[modifiedIndex(firstIndex)] = e;
+        }
+
+        @Override
+        public boolean add(E e) {
+            addLast(e);
+            return true;
+        }
+
+        @Override
+        public void addLast(E e) {
+            if (size() == array.length) {
+                expand();
+            }
+            lastIndex += 1;
+            array[modifiedIndex(lastIndex - 1)] = e;
+        }
+
+        @Override
+        public E pollFirst() {
+            if (size() == 0) {
+                return null;
+            }
+            if (size() == array.length / 4) {
+                contract();
+            }
+            E ret = array[modifiedIndex(firstIndex)];
+            array[modifiedIndex(firstIndex)] = null;
+            firstIndex += 1;
+            return ret;
+        }
+
+        @Override
+        public E poll() {
+            return pollFirst();
+        }
+
+        @Override
+        public E removeFirst() {
+            if (size() == 0) {
+                throw new NoSuchElementException("Queue is empty, no first element");
+            }
+            return pollFirst();
+        }
+        
+        @Override
+        public E pop() {
+            return removeFirst();
+        }
+
+        @Override
+        public E remove() {
+            return removeFirst();
+        }
+
+        @Override
+        public E pollLast() {
+            if (size() == 0) {
+                return null;
+            }
+            if (size() == array.length / 4) {
+                contract();
+            }
+            lastIndex -= 1;
+            E ret = array[modifiedIndex(lastIndex)];
+            array[modifiedIndex(lastIndex)] = null;
+            return ret;
+        }
+
+        @Override
+        public E removeLast() {
+            if (size() == 0) {
+                throw new NoSuchElementException("Queue is empty, no first element");
+            }
+            return pollLast();
+        }
+
+        @Override
+        public E peekFirst() {
+            if (size() == 0) {
+                return null;
+            }
+            return array[modifiedIndex(firstIndex)];
+        }
+
+        @Override
+        public E peek() {
+            return peekFirst();
+        }
+
+        @Override
+        public E getFirst() {
+            if (size() == 0) {
+                throw new NoSuchElementException("Queue is empty, no first element");
+            }
+            return array[modifiedIndex(firstIndex)];
+        }
+
+        @Override
+        public E element() {
+            return getFirst();
+        }
+
+        @Override
+        public E peekLast() {
+            if (size() == 0) {
+                return null;
+            }
+            return array[modifiedIndex(lastIndex - 1)];
+        }
+
+        @Override
+        public E getLast() {
+            if (size() == 0) {
+                throw new NoSuchElementException("Queue is empty, no last element");
+            }
+            return array[modifiedIndex(lastIndex - 1)];
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return new Iterator<E>() {
+                E[] arr = asArray();
+                int nextIndex = 0;
+                @Override
+                public boolean hasNext() {
+                    return nextIndex < arr.length;
+                }
+
+                @Override
+                public E next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException("No next element");
+                    }
+                    nextIndex += 1;
+                    return arr[nextIndex - 1];
+                }
+            };
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            int index = 0;
+            for (E i : this) {
+                if (Objects.equals(o, i)) {
+                    return index;
+                }
+                index += 1;
+            }
+            return -1;
+        }
+
+        @Override
+        public boolean removeFirstOccurrence(Object o) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean removeLastOccurrence(Object o) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends E> c) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void add(int i, E e) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public ListIterator<E> listIterator(int i) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public ListIterator<E> listIterator() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean offerFirst(E e) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean offerLast(E e) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean offer(E e) {
+            return offerLast(e);
+        }
+        
+        @Override
+        public int lastIndexOf(Object o) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public E remove(int i) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void push(E e) {
+            addFirst(e);
+        }
+
+        @Override
+        public Iterator<E> descendingIterator() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<E> subList(int fromIndex, int toIndex) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override @SuppressWarnings("unchecked")
+        public void clear() {
+            array = (E[]) new Object[2];
+
+            firstIndex = 0;
+            lastIndex = 0;
+        }
+
+        @Override
+        public BetterArrayDeque<E> clone() {
+            return new BetterArrayDeque<E>(this);
+        }
+
+        public String toString(String open, String between, String close) {
+            if (isEmpty()) {
+                return open + close;
+            }
+            StringBuilder sb = new StringBuilder(open);
+            Iterator<E> iterator = iterator();
+            while (true) {
+                sb.append(iterator.next());
+                if (!iterator.hasNext()) {
+                    return sb.append(close).toString();
+                }
+                sb.append(between);
+            }
+        }
+    }
 }

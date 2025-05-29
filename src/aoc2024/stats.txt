@@ -15,7 +15,7 @@ Day 13: Part 1 : N/A       | Part 2 : N/A
 Day 14: Part 1 : N/A       | Part 2 : N/A
 Day 15: Part 1 : N/A       | Part 2 : N/A
 Day 16: Part 1 : N/A       | Part 2 : N/A
-Day 17: Part 1 : N/A       | Part 2 : N/A
+Day 17: Part 1 :   4.07 ms | Part 2 :   0.11 ms
 Day 18: Part 1 : N/A       | Part 2 : N/A
 Day 19: Part 1 : N/A       | Part 2 : N/A
 Day 20: Part 1 : N/A       | Part 2 : N/A
