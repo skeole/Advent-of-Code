@@ -19,7 +19,7 @@ Day 17: Part 1 :   4.07 ms | Part 2 :   0.11 ms
 Day 18: Part 1 : N/A       | Part 2 : N/A
 Day 19: Part 1 : N/A       | Part 2 : N/A
 Day 20: Part 1 : N/A       | Part 2 : N/A
-Day 21: Part 1 : N/A       | Part 2 : N/A
+Day 21: Part 1 :  11.54 ms | Part 2 :   9.43 ms
 Day 22: Part 1 : N/A       | Part 2 : N/A
 Day 23: Part 1 : N/A       | Part 2 : N/A
 Day 24: Part 1 : N/A       | Part 2 : N/A
