@@ -173,15 +173,38 @@ public class Problem {
 
     public static Object partOne() {
         outputs.clear();
-        pointer = 0;
-        while (true) {
-            if (pointer > instructions.size() - 2) {
-                break;
+        if (!actual) {
+            pointer = 0;
+            while (true) {
+                if (pointer > instructions.size() - 2) {
+                    break;
+                }
+                commands[instructions.get(pointer)].function(instructions.get(pointer + 1));
+                pointer += 2;
             }
-            commands[instructions.get(pointer)].function(instructions.get(pointer + 1));
-            pointer += 2;
+        } else { // based on what it is fr fr
+            BetterArrayDeque<Boolean> A = registers.get(0);
+            int length = A.size();
+            for (int i = 0; i < 7; i += 1) {
+                A.addLast(false);
+            }
+
+            for (int i = 0; i < length; i += 3) {
+                int mod8 = 
+                    (A.get(i) ? 1 : 0) + 
+                    (A.get(i + 1) ? 2 : 0) + 
+                    (A.get(i + 2) ? 4 : 0);
+                
+                int offset = mod8 / 4 * 4 + 3 - (mod8 % 4);
+
+                outputs.addLast(
+                    (A.get(i) == A.get(i + offset) ? 1 : 0) + 
+                    (A.get(i + 1) == A.get(i + offset + 1) ? 2 : 0) + 
+                    (A.get(i + 2) == A.get(i + offset + 2) ? 4 : 0)
+                );
+            }
         }
-        return outputs.toString("", ",", "");
+        return outputs;
     }
 
     public static Object partTwo() { // yeah... this is an analysis question
@@ -225,7 +248,7 @@ public class Problem {
 
         // we want to reverse-engineer from the end. Note: after the last three, there should be all zeroes
 
-        if (!actual) {
+        if (!actual) { // target: 2,4,1,3,7,5,0,3,1,4,4,7,5,5,3,0
             return "Not applicable: input follows pattern";
         }
 

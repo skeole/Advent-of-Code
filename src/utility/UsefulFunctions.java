@@ -97,18 +97,6 @@ public class UsefulFunctions {
         System.out.println(sb.delete(1, 3).append("]").toString());
     }
 
-    public static void println(Object[] list) {
-        if (list.length == 0) {
-            System.out.println("[]");
-            return;
-        }
-        StringBuilder sb = new StringBuilder("[");
-        for (Object o : list) {
-            sb.append(", ").append(o);
-        }
-        System.out.println(sb.delete(1, 3).append("]").toString());
-    }
-
     public static void println(int[][] array) { // figure out max length of number
 
     }
@@ -121,8 +109,20 @@ public class UsefulFunctions {
 
     }
 
+    public static <E> void println(E[] array) {
+
+    }
+
     public static void println(Object[][] array) {
 
+    }
+
+    public static void printValues(Object... toPrint) {
+        StringBuilder sb = new StringBuilder();
+        for (Object o : toPrint) {
+            sb.append(o).append(' ');
+        }
+        System.out.println(sb);
     }
 
     public static int to_ascii(char c) {
@@ -153,8 +153,8 @@ public class UsefulFunctions {
     }
 
     public static class Tuple<F, S> {
-        private F first;
-        private S second;
+        protected F first;
+        protected S second;
 
         public Tuple(F first, S second) {
             this.first = first;
@@ -167,6 +167,18 @@ public class UsefulFunctions {
 
         public S getSecond() {
             return second;
+        }
+
+        public F updateFirst(F first) {
+            F ret = first;
+            this.first = first;
+            return ret;
+        }
+
+        public S updateSecond(S second) {
+            S ret = second;
+            this.second = second;
+            return ret;
         }
 
         @Override
@@ -187,8 +199,39 @@ public class UsefulFunctions {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            Tuple<F, S> oo = (Tuple<F, S>) o;
-            return Objects.equals(getFirst(), oo.getFirst()) && Objects.equals(getSecond(), oo.getSecond());
+            Tuple<F, S> t = (Tuple<F, S>) o;
+            return Objects.equals(getFirst(), t.getFirst()) && Objects.equals(getSecond(), t.getSecond());
+        }
+
+        @Override
+        public int hashCode() {
+            return first.hashCode() * 31 + second.hashCode();
+        }
+    }
+
+    public static class UnorderedTuple<E> extends Tuple<E, E> {
+        public UnorderedTuple(E first, E second) {
+            super(first, second);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            UnorderedTuple<E> ut = (UnorderedTuple<E>) o;
+            return 
+                (Objects.equals(getFirst(), ut.getFirst()) && Objects.equals(getSecond(), ut.getSecond())) || 
+                (Objects.equals(getFirst(), ut.getSecond()) && Objects.equals(getSecond(), ut.getFirst()));
+        }
+
+        @Override
+        public int hashCode() {
+            return first.hashCode() ^ second.hashCode(); // XOR not exponentiation... I believe
         }
     }
 
@@ -201,9 +244,64 @@ public class UsefulFunctions {
             this.imaginary = imaginary;
         }
 
+        public ComplexNumber rotateCounterClockwise() {
+            return new ComplexNumber(-imaginary, real);
+
+        }
+
+        public ComplexNumber rotateClockwise() {
+            // return this.rotateCounterClockwise().rotateCounterClockwise().rotateCounterClockwise(); // CIS 1200 reference
+            return new ComplexNumber(imaginary, -real);
+        }
+
+        public ComplexNumber plus(ComplexNumber c) {
+            return new ComplexNumber(real + c.real, imaginary + c.imaginary);
+        }
+
+        public ComplexNumber minus(ComplexNumber c) {
+            return new ComplexNumber(real - c.real, imaginary - c.imaginary);
+        }
+
+        public ComplexNumber times(int i) {
+            return new ComplexNumber(real * i, imaginary * i);
+        }
+
+        public ComplexNumber times(ComplexNumber c) {
+            return new ComplexNumber(real * c.real - imaginary * c.imaginary, imaginary * c.real + real * c.imaginary);
+        }
+
+        /** (0, 0) refers to the bottom left corner of the graph. 
+         * This means (x + yi) -> 
+         * @return graph[length - 1 - y][x], or null if out of bounds. Note: null does not necessarily mean out of bounds
+         */
+        public <E> E getPositionInGraph(E[][] graph) {
+            if (imaginary < 0 || imaginary >= graph.length || real < 0 || real >= graph[graph.length - 1 - imaginary].length) {
+                return null;
+            } else {
+                return graph[graph.length - 1 - imaginary][real];
+            }
+        }
+
         @Override
         public String toString() {
             return String.valueOf(real) + (imaginary < 0 ? " - " : " + ") + String.valueOf(Math.abs(imaginary)) + "i";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            ComplexNumber cn = (ComplexNumber) o;
+            return (real == cn.real) && (imaginary == cn.imaginary);
+        }
+
+        @Override
+        public int hashCode() {
+            return real + 31 * imaginary;
         }
     }
 
@@ -546,6 +644,183 @@ public class UsefulFunctions {
                 }
                 sb.append(between);
             }
+        }
+    }
+
+    public static class HashMultiSet<E> extends AbstractCollection<E> { // can make abstract --> can be a TreeSet as well :D
+        private int size = 0;
+        private Map<E, Integer> map = new HashMap<>();
+        private Class<? extends Object> c = null;
+
+        @Override
+        public int size() {
+            return size;
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return new Iterator<E>() {
+                Iterator<E> keys = map.keySet().iterator();
+                boolean started = false;
+                E current = null;
+                int currentCounter = 0;
+
+                @Override
+                public boolean hasNext() {
+                    return keys.hasNext() || (started && currentCounter <= map.get(current));
+                }
+
+                @Override
+                public E next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
+                    if (!started) {
+                        current = keys.next();
+                    }
+                    if (currentCounter > map.get(current)) {
+                        currentCounter = 0;
+                        current = keys.next();
+                        return current;
+                    } else {
+                        currentCounter += 1;
+                        return current;
+                    }
+                }
+                
+            };
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return map.containsKey(o);
+        }
+
+        @Override
+        public boolean add(E e) {
+            if (e != null && c == null) {
+                c = e.getClass();
+            }
+            if (!map.containsKey(e)) {
+                map.put(e, 0);
+            }
+            map.replace(e, map.get(e) + 1);
+            size += 1;
+            return true;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            if (size() == 0) {
+                return false;
+            }
+            if (c == null) {
+                if (o == null) {
+                    if (map.containsKey(null)) {
+                        map.replace(null, map.get(null) - 1);
+                        size -= 1;
+                        if (map.get(null) == 0) {
+                            map.remove(null);
+                        }
+                        return true;
+                    }
+                }
+            } else if (c.isInstance(o)) {
+                @SuppressWarnings(value = "unchecked")
+                E oelt = (E) o;
+                
+                if (map.containsKey(oelt)) {
+                    map.replace(oelt, map.get(oelt) - 1);
+                    size -= 1;
+                    if (map.get(oelt) == 0) {
+                        map.remove(oelt);
+                    }
+                    return true;
+                }
+            } // this is all very useful code so I'll keep it - but in practice it is not needed, oops lol
+            return false;
+        }
+    }
+
+    public static class DoubleHashMap<A, B> extends AbstractMap<A, B> { // once again, can make abstract. However, the reverse should still be a HashMap
+        private HashMap<A, B> first = new HashMap<>();
+        private HashMap<B, HashSet<A>> second = new HashMap<>();
+
+        @Override
+        public int size() {
+            return first.size();
+        }
+
+        @Override
+        public boolean containsKey(Object key) {
+            return first.containsKey(key);
+        }
+
+        @Override
+        public boolean containsValue(Object value) {
+            return second.containsKey(value);
+        }
+
+        @Override
+        public B get(Object key) {
+            return first.get(key);
+        };
+
+        public Collection<A> getKeysOfValue(Object value) {
+            return second.get(value);
+        }
+
+        public A getFirstKeyOfValue(Object value) {
+            if (containsValue(value)) {
+                return second.get(value).iterator().next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public B put(A key, B value) {
+
+            if (!second.containsKey(value)) {
+                second.put(value, new HashSet<>());
+            }
+            second.get(value).add(key);
+
+            if (!first.containsKey(key)) {
+                first.put(key, value);
+                return null;
+            } else {
+                B old = first.replace(key, value);
+                second.get(old).remove(key);
+                if (second.get(old).size() == 0) {
+                    second.remove(old);
+                }
+                return old;
+            }
+        }
+
+        @Override
+        public B remove(Object key) {
+            if (first.containsKey(key)) {
+                B old = first.remove(key);
+                second.get(old).remove(key);
+                if (second.get(old).size() == 0) {
+                    second.remove(old);
+                }
+                return old;
+            }
+            return null;
+        }
+
+        @Override
+        public void clear() {
+            first.clear();
+            second.clear();
+        }
+
+        @Override
+        public Set<Entry<A, B>> entrySet() {
+            return first.entrySet();
         }
     }
 }
